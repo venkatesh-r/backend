@@ -1,41 +1,17 @@
-import express, { Application, Request, Response } from "express";
+import dotenv from "dotenv";
+import express, { Application } from "express";
 import connectDB from "./config/database";
-import Widget from "./modules/widget";
+import widgetRouter from "./routes/widgetRouter";
+
+dotenv.config();
 
 const app: Application = express();
 app.use(express.json());
 
-app.get("/widgets", async (req: Request, res: Response) => {
-  try {
-    const widgetList = await Widget.find({});
-    res.json({ message: widgetList });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(404).send("ERROR::" + error.message);
-    } else {
-      res.status(404).send("ERROR: An unknown error occured");
-    }
-  }
-});
+//Routes
+app.use("/", widgetRouter);
 
-app.post("/widgets", async (req: Request, res: Response) => {
-  try {
-    const { location } = req.body;
-    const widget = new Widget({
-      location: location,
-    });
-    const widgetList = await widget.save();
-    res.json({ title: "Widget added sucessfully", message: widgetList });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(404).send("ERROR::" + error.message);
-    } else {
-      res.status(404).send("ERROR: An unknown error occured");
-    }
-  }
-});
-
-const PORT: number = 5000;
+const PORT = process.env.PORT;
 
 connectDB()
   .then(() => {
